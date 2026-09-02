@@ -1,0 +1,30 @@
+{
+  "name": "dfy-ghl-system",
+  "version": "1.0.0",
+  "description": "Property-first CRM/automation platform architecture for high-volume US real estate\r wholesaling operations. This repo currently contains architecture-stage scaffolding:\r schema, workflow-engine, and valuation-engine reference code extracted from the\r full technical spec.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/majeedkamran855-afk/DFY-GHL-SYSTEM.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/majeedkamran855-afk/DFY-GHL-SYSTEM/issues"
+  },
+  "homepage": "https://github.com/majeedkamran855-afk/DFY-GHL-SYSTEM#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "prisma": "^5.22.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "express": "^5.2.1"
+  }
+}
