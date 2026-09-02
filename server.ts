@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const PORT = 3000;
 
 app.use(express.json());
-
+app.use(express.static('public'));
 // Health check
 app.get('/', (req, res) => {
   res.json({ status: 'WholesaleOS API is running' });

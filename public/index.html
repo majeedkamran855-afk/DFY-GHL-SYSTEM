@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WholesaleOS - Properties</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; }
+    h1 { color: #1a1a1a; }
+    form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 12px; font-weight: bold; font-size: 14px; }
+    input, select { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { margin-top: 16px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    button:hover { background: #1d4ed8; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+    th { background: #f0f0f0; }
+    .tag { display: inline-block; background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 4px; }
+  </style>
+</head>
+<body>
+  <h1>WholesaleOS — Properties</h1>
+
+  <form id="propertyForm">
+    <label>Organization ID</label>
+    <input type="text" id="organizationId" required>
+
+    <label>Workspace ID</label>
+    <input type="text" id="workspaceId" required>
+
+    <label>Address</label>
+    <input type="text" id="addressLine1" required>
+
+    <label>City</label>
+    <input type="text" id="city" required>
+
+    <label>State</label>
+    <input type="text" id="state" required>
+
+    <label>Zip</label>
+    <input type="text" id="zip" required>
+
+    <label>Bedrooms</label>
+    <input type="number" id="bedrooms">
+
+    <label>Square Footage</label>
+    <input type="number" id="squareFootage">
+
+    <label>Property Type</label>
+    <select id="propertyType">
+      <option value="SINGLE_FAMILY">Single Family</option>
+      <option value="MULTI_FAMILY_2_4">Multi Family (2-4)</option>
+      <option value="CONDO">Condo</option>
+      <option value="LAND">Land</option>
+    </select>
+
+    <button type="submit">Add Property</button>
+  </form>
+
+  <h2>All Properties</h2>
+  <table id="propertyTable">
+    <thead>
+      <tr><th>Address</th><th>City/State</th><th>Beds</th><th>Sqft</th><th>Tags</th></tr>
+    </thead>
+    <tbody id="propertyRows"></tbody>
+  </table>
+
+  <script>
+    async function loadProperties() {
+      const res = await fetch('/properties');
+      const properties = await res.json();
+      const rows = document.getElementById('propertyRows');
+      rows.innerHTML = '';
+      properties.forEach(p => {
+        const tags = (p.distressTags || []).map(t => `<span class="tag">${t}</span>`).join('');
+        rows.innerHTML += `<tr>
+          <td>${p.addressLine1}</td>
+          <td>${p.city}, ${p.state} ${p.zip}</td>
+          <td>${p.bedrooms ?? '-'}</td>
+          <td>${p.squareFootage ?? '-'}</td>
+          <td>${tags}</td>
+        </tr>`;
+      });
+    }
+
+    document.getElementById('propertyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const body = {
+        organizationId: document.getElementById('organizationId').value,
+        workspaceId: document.getElementById('workspaceId').value,
+        addressLine1: document.getElementById('addressLine1').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        zip: document.getElementById('zip').value,
+        bedrooms: document.getElementById('bedrooms').value ? Number(document.getElementById('bedrooms').value) : undefined,
+        squareFootage: document.getElementById('squareFootage').value ? Number(document.getElementById('squareFootage').value) : undefined,
+        propertyType: document.getElementById('propertyType').value,
+      };
+
+      const res = await fetch('/properties', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        document.getElementById('propertyForm').reset();
+        loadProperties();
+      } else {
+        const err = await res.json();
+        alert('Error: ' + err.error);
+      }
+    });
+
+    loadProperties();
+  </script>
+</body>
+</html>
