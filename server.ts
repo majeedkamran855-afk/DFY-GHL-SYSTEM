@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-
+import { calculateMAO } from './src/valuation/mao-calculator';
 const app = express();
 const prisma = new PrismaClient();
 const PORT = 3000;
@@ -71,7 +71,27 @@ app.post('/buyers', async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 });
+// ---------------- MAO CALCULATOR ----------------
+app.post('/calculate-mao', (req, res) => {
+  try {
+    const { arv, repairEstimate, wholesaleFeeTarget, investorMarginFactor } = req.body;
 
+    if (arv === undefined || repairEstimate === undefined || wholesaleFeeTarget === undefined) {
+      return res.status(400).json({ error: 'arv, repairEstimate, and wholesaleFeeTarget are required' });
+    }
+
+    const mao = calculateMAO({
+      arv: Number(arv),
+      repairEstimate: Number(repairEstimate),
+      wholesaleFeeTarget: Number(wholesaleFeeTarget),
+      investorMarginFactor: investorMarginFactor ? Number(investorMarginFactor) : undefined,
+    });
+
+    res.json({ arv, repairEstimate, wholesaleFeeTarget, investorMarginFactor: investorMarginFactor ?? 0.7, maxAllowableOffer: mao });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
