@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WholesaleOS - Contacts</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; }
+    h1 { color: #1a1a1a; }
+    nav { margin-bottom: 20px; }
+    nav a { margin-right: 16px; color: #2563eb; text-decoration: none; font-weight: bold; }
+    form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 12px; font-weight: bold; font-size: 14px; }
+    input { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { margin-top: 16px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    button:hover { background: #1d4ed8; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+    th { background: #f0f0f0; }
+    .id-cell { font-size: 11px; color: #666; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">Properties</a>
+    <a href="/contacts.html">Contacts</a>
+    <a href="/deals.html">Deals</a>
+  </nav>
+
+  <h1>WholesaleOS — Contacts</h1>
+
+  <form id="contactForm">
+    <label>Organization ID</label>
+    <input type="text" id="organizationId" required>
+
+    <label>First Name</label>
+    <input type="text" id="firstName">
+
+    <label>Last Name</label>
+    <input type="text" id="lastName">
+
+    <button type="submit">Add Contact</button>
+  </form>
+
+  <h2>All Contacts</h2>
+  <table id="contactTable">
+    <thead>
+      <tr><th>Name</th><th>Contact ID (copy this for Deals)</th></tr>
+    </thead>
+    <tbody id="contactRows"></tbody>
+  </table>
+
+  <script>
+    async function loadContacts() {
+      const res = await fetch('/contacts');
+      const contacts = await res.json();
+      const rows = document.getElementById('contactRows');
+      rows.innerHTML = '';
+      contacts.forEach(c => {
+        rows.innerHTML += `<tr>
+          <td>${c.firstName || ''} ${c.lastName || ''}</td>
+          <td class="id-cell">${c.id}</td>
+        </tr>`;
+      });
+    }
+
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const body = {
+        organizationId: document.getElementById('organizationId').value,
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+      };
+
+      const res = await fetch('/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': 'wholesale-secret-2026-change-me' },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        document.getElementById('contactForm').reset();
+        loadContacts();
+      } else {
+        const err = await res.json();
+        alert('Error: ' + err.error);
+      }
+    });
+
+    loadContacts();
+  </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WholesaleOS - Deals</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; }
+    h1 { color: #1a1a1a; }
+    nav { margin-bottom: 20px; }
+    nav a { margin-right: 16px; color: #2563eb; text-decoration: none; font-weight: bold; }
+    form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 12px; font-weight: bold; font-size: 14px; }
+    input, select { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { margin-top: 16px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    button:hover { background: #1d4ed8; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+    th { background: #f0f0f0; }
+    .stage { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; background: #dbeafe; color: #1e40af; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">Properties</a>
+    <a href="/contacts.html">Contacts</a>
+    <a href="/deals.html">Deals</a>
+  </nav>
+
+  <h1>WholesaleOS — Deals Pipeline</h1>
+
+  <form id="dealForm">
+    <label>Organization ID</label>
+    <input type="text" id="organizationId" required>
+
+    <label>Workspace ID</label>
+    <input type="text" id="workspaceId" required>
+
+    <label>Property ID (copy from Properties page - view /properties in browser)</label>
+    <input type="text" id="propertyId" required>
+
+    <label>Primary Contact ID (copy from Contacts page)</label>
+    <input type="text" id="primaryContactId" required>
+
+    <label>Stage</label>
+    <select id="stage">
+      <option value="NEW_LEAD">New Lead</option>
+      <option value="COLD_CONTACTED">Cold Contacted</option>
+      <option value="SELLER_LEAD">Seller Lead</option>
+      <option value="APPOINTMENT_SET">Appointment Set</option>
+      <option value="OFFER_MADE">Offer Made</option>
+      <option value="UNDER_CONTRACT">Under Contract</option>
+      <option value="DISPO_ACTIVE">Dispo Active</option>
+      <option value="CLOSED_WON">Closed Won</option>
+      <option value="CLOSED_LOST">Closed Lost</option>
+    </select>
+
+    <label>Lead Source</label>
+    <input type="text" id="leadSource" placeholder="e.g. cold_call, direct_mail">
+
+    <button type="submit">Add Deal</button>
+  </form>
+
+  <h2>All Deals</h2>
+  <table id="dealTable">
+    <thead>
+      <tr><th>Stage</th><th>Lead Source</th><th>Created</th></tr>
+    </thead>
+    <tbody id="dealRows"></tbody>
+  </table>
+
+  <script>
+    async function loadDeals() {
+      const res = await fetch('/deals');
+      const deals = await res.json();
+      const rows = document.getElementById('dealRows');
+      rows.innerHTML = '';
+      deals.forEach(d => {
+        rows.innerHTML += `<tr>
+          <td><span class="stage">${d.stage}</span></td>
+          <td>${d.leadSource || '-'}</td>
+          <td>${new Date(d.createdAt).toLocaleDateString()}</td>
+        </tr>`;
+      });
+    }
+
+    document.getElementById('dealForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const body = {
+        organizationId: document.getElementById('organizationId').value,
+        workspaceId: document.getElementById('workspaceId').value,
+        propertyId: document.getElementById('propertyId').value,
+        primaryContactId: document.getElementById('primaryContactId').value,
+        stage: document.getElementById('stage').value,
+        leadSource: document.getElementById('leadSource').value,
+      };
+
+      const res = await fetch('/deals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': 'wholesale-secret-2026-change-me' },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        document.getElementById('dealForm').reset();
+        loadDeals();
+      } else {
+        const err = await res.json();
+        alert('Error: ' + err.error);
+      }
+    });
+
+    loadDeals();
+  </script>
+</body>
+</html>
