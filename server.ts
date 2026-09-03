@@ -7,6 +7,14 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use(express.static('public'));
+// Simple API key protection for write operations
+function requireApiKey(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const key = req.headers['x-api-key'];
+  if (key !== process.env.API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized: missing or invalid API key' });
+  }
+  next();
+}
 // Health check
 app.get('/', (req, res) => {
   res.json({ status: 'WholesaleOS API is running' });
@@ -18,7 +26,7 @@ app.get('/properties', async (req, res) => {
   res.json(properties);
 });
 
-app.post('/properties', async (req, res) => {
+app.post('/properties', requireApiKey, async (req, res) => {
   try {
     const property = await prisma.property.create({ data: req.body });
     res.status(201).json(property);
@@ -33,7 +41,7 @@ app.get('/contacts', async (req, res) => {
   res.json(contacts);
 });
 
-app.post('/contacts', async (req, res) => {
+app.post('/contacts', requireApiKey, async (req, res) => {
   try {
     const contact = await prisma.contact.create({ data: req.body });
     res.status(201).json(contact);
@@ -48,7 +56,7 @@ app.get('/deals', async (req, res) => {
   res.json(deals);
 });
 
-app.post('/deals', async (req, res) => {
+app.post('/deals', requireApiKey, async (req, res) => {
   try {
     const deal = await prisma.deal.create({ data: req.body });
     res.status(201).json(deal);
@@ -63,7 +71,7 @@ app.get('/buyers', async (req, res) => {
   res.json(buyers);
 });
 
-app.post('/buyers', async (req, res) => {
+app.post('/buyers', requireApiKey, async (req, res) => {
   try {
     const buyer = await prisma.buyer.create({ data: req.body });
     res.status(201).json(buyer);
@@ -72,7 +80,7 @@ app.post('/buyers', async (req, res) => {
   }
 });
 // ---------------- MAO CALCULATOR ----------------
-app.post('/calculate-mao', (req, res) => {
+app.post('/calculate-mao', requireApiKey, (req, res) => {
   try {
     const { arv, repairEstimate, wholesaleFeeTarget, investorMarginFactor } = req.body;
 
