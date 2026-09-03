@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WholesaleOS - Buyers</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; }
+    h1 { color: #1a1a1a; }
+    nav { margin-bottom: 20px; }
+    nav a { margin-right: 16px; color: #2563eb; text-decoration: none; font-weight: bold; }
+    form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    label { display: block; margin-top: 12px; font-weight: bold; font-size: 14px; }
+    input { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { margin-top: 16px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    button:hover { background: #1d4ed8; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+    th { background: #f0f0f0; }
+    .vip { display: inline-block; background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/">Properties</a>
+    <a href="/contacts.html">Contacts</a>
+    <a href="/deals.html">Deals</a>
+    <a href="/buyers.html">Buyers</a>
+  </nav>
+
+  <h1>WholesaleOS — Buyers</h1>
+
+  <form id="buyerForm">
+    <label>Organization ID</label>
+    <input type="text" id="organizationId" required>
+
+    <label>Company Name</label>
+    <input type="text" id="companyName">
+
+    <label>Min Budget</label>
+    <input type="number" id="minBudget">
+
+    <label>Max Budget</label>
+    <input type="number" id="maxBudget">
+
+    <label>Buy Box Zip Codes (comma separated)</label>
+    <input type="text" id="buyBoxZips" placeholder="e.g. 85001, 85003, 85005">
+
+    <label><input type="checkbox" id="vipTier" style="width: auto; display: inline; margin-right: 6px;"> VIP Tier</label>
+
+    <button type="submit">Add Buyer</button>
+  </form>
+
+  <h2>All Buyers</h2>
+  <table id="buyerTable">
+    <thead>
+      <tr><th>Company</th><th>Budget Range</th><th>Buy Box Zips</th><th>VIP</th></tr>
+    </thead>
+    <tbody id="buyerRows"></tbody>
+  </table>
+
+  <script>
+    async function loadBuyers() {
+      const res = await fetch('/buyers');
+      const buyers = await res.json();
+      const rows = document.getElementById('buyerRows');
+      rows.innerHTML = '';
+      buyers.forEach(b => {
+        rows.innerHTML += `<tr>
+          <td>${b.companyName || '-'}</td>
+          <td>${b.minBudget ?? '-'} - ${b.maxBudget ?? '-'}</td>
+          <td>${(b.buyBoxZips || []).join(', ') || '-'}</td>
+          <td>${b.vipTier ? '<span class="vip">VIP</span>' : ''}</td>
+        </tr>`;
+      });
+    }
+
+    document.getElementById('buyerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const zipsRaw = document.getElementById('buyBoxZips').value;
+      const body = {
+        organizationId: document.getElementById('organizationId').value,
+        companyName: document.getElementById('companyName').value,
+        minBudget: document.getElementById('minBudget').value ? Number(document.getElementById('minBudget').value) : undefined,
+        maxBudget: document.getElementById('maxBudget').value ? Number(document.getElementById('maxBudget').value) : undefined,
+        buyBoxZips: zipsRaw ? zipsRaw.split(',').map(z => z.trim()) : [],
+        vipTier: document.getElementById('vipTier').checked,
+      };
+
+      const res = await fetch('/buyers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': 'wholesale-secret-2026-change-me' },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        document.getElementById('buyerForm').reset();
+        loadBuyers();
+      } else {
+        const err = await res.json();
+        alert('Error: ' + err.error);
+      }
+    });
+
+    loadBuyers();
+  </script>
+</body>
+</html>
