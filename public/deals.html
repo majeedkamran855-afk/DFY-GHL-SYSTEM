@@ -36,11 +36,11 @@
     <label>Workspace ID</label>
     <input type="text" id="workspaceId" required>
 
-    <label>Property ID (copy from Properties page - view /properties in browser)</label>
-    <input type="text" id="propertyId" required>
+    <label>Property</label>
+    <select id="propertyId" required></select>
 
-    <label>Primary Contact ID (copy from Contacts page)</label>
-    <input type="text" id="primaryContactId" required>
+    <label>Primary Contact</label>
+    <select id="primaryContactId" required></select>
 
     <label>Stage</label>
     <select id="stage">
@@ -70,6 +70,23 @@
   </table>
 
   <script>
+   async function loadDropdowns() {
+  const propRes = await fetch('/properties');
+  const properties = await propRes.json();
+  const propSelect = document.getElementById('propertyId');
+  propSelect.innerHTML = '<option value="">-- Select a property --</option>';
+  properties.forEach(p => {
+    propSelect.innerHTML += `<option value="${p.id}">${p.addressLine1}, ${p.city}, ${p.state}</option>`;
+  });
+
+  const contactRes = await fetch('/contacts');
+  const contacts = await contactRes.json();
+  const contactSelect = document.getElementById('primaryContactId');
+  contactSelect.innerHTML = '<option value="">-- Select a contact --</option>';
+  contacts.forEach(c => {
+    contactSelect.innerHTML += `<option value="${c.id}">${c.firstName || ''} ${c.lastName || ''}</option>`;
+  });
+}
     async function loadDeals() {
       const res = await fetch('/deals');
       const deals = await res.json();
@@ -111,6 +128,7 @@
     });
 
     loadDeals();
+    loadDropdowns();
   </script>
 </body>
 </html>
