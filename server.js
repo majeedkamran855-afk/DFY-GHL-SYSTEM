@@ -3,6 +3,7 @@ const crypto = require('node:crypto');
 const path = require('node:path');
 const { promisify } = require('node:util');
 const { PrismaClient } = require('@prisma/client');
+const { calculateMAO } = require('./src/valuation/mao-calculator');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -270,7 +271,7 @@ app.post('/api/calculate-mao', requireAuth, (req, res, next) => {
         arv < 0 || repairEstimate < 0 || wholesaleFeeTarget < 0 || factor <= 0 || factor > 1) {
       throw new Error('Provide valid non-negative amounts and a factor between 0 and 1');
     }
-    res.json({ maxAllowableOffer: Math.max(0, Math.round(arv * factor - repairEstimate - wholesaleFeeTarget)) });
+    res.json({ maxAllowableOffer: calculateMAO({ arv, repairEstimate, wholesaleFeeTarget, investorMarginFactor: factor }) });
   } catch (error) { next(error); }
 });
 
