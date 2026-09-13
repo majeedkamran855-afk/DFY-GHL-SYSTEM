@@ -59,12 +59,26 @@ model User {
   name           String
   role           Role
   phoneExtension String?
+  passwordHash   String
   active         Boolean      @default(true)
   createdAt      DateTime     @default(now())
 
   workspaces    WorkspaceMember[]
   assignedDeals Deal[]    @relation("DealAssignee")
   callLogs      CallLog[]
+  sessions      Session[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 enum Role {
