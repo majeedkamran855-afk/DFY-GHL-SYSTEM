@@ -1,123 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>WholesaleOS - Properties</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; }
-    h1 { color: #1a1a1a; }
-    form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    label { display: block; margin-top: 12px; font-weight: bold; font-size: 14px; }
-    input, select { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-    button { margin-top: 16px; padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-    button:hover { background: #1d4ed8; }
-    table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
-    th { background: #f0f0f0; }
-    .tag { display: inline-block; background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 4px; }
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WholesaleOS</title>
+<style>
+:root{font-family:Inter,system-ui,sans-serif;color:#152033;background:#f3f6fb}*{box-sizing:border-box}
+body{margin:0}.shell{max-width:1180px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+h1{margin:0;font-size:25px}h2{font-size:17px;margin:0 0 15px}p{color:#5d687a}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:#fff;border:1px solid #e2e7ef;border-radius:14px;padding:18px;box-shadow:0 5px 18px #23395d0d}
+.auth{max-width:460px;margin:8vh auto}.tabs{display:flex;gap:8px;margin-bottom:18px}.tabs button.active{background:#162a4a;color:#fff}
+label{display:block;font-size:12px;font-weight:700;margin:11px 0 5px}input,select,button{font:inherit}
+input,select{width:100%;padding:10px;border:1px solid #cfd7e4;border-radius:8px;background:#fff}
+button{border:0;border-radius:8px;padding:10px 14px;cursor:pointer;font-weight:700;background:#e8edf5;color:#23324a}
+button.primary{background:#1769e0;color:#fff;width:100%;margin-top:15px}.muted{font-size:12px}.hidden{display:none!important}
+.list{margin-top:15px;border-top:1px solid #edf0f5}.row{padding:10px 0;border-bottom:1px solid #edf0f5}
+.row strong,.row span{display:block}.row span{font-size:12px;color:#6a7485;margin-top:3px}.error{color:#b42318;font-size:13px}
+.badge{display:inline-block!important;width:auto;padding:3px 7px;border-radius:20px;background:#e7f0ff;color:#1756a9!important}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;gap:12px}}
+</style>
 </head>
-<body>
-<nav style="margin-bottom: 20px;">
-  <a href="/" style="margin-right: 16px; color: #2563eb; text-decoration: none; font-weight: bold;">Properties</a>
-  <a href="/contacts.html" style="margin-right: 16px; color: #2563eb; text-decoration: none; font-weight: bold;">Contacts</a>
-  <a href="/deals.html" style="margin-right: 16px; color: #2563eb; text-decoration: none; font-weight: bold;">Deals</a>
-<a href="/buyers.html" style="margin-right: 16px; color: #2563eb; text-decoration: none; font-weight: bold;">Buyers</a>
-</nav>
-  <h1>WholesaleOS — Properties</h1>
+<body><main class="shell">
+<section id="auth" class="card auth">
+<h1>WholesaleOS</h1><p>Property-first CRM for real estate wholesalers.</p>
+<div class="tabs"><button id="loginTab" class="active">Log in</button><button id="registerTab">Create company</button></div>
+<form id="authForm">
+<div id="registerFields" class="hidden"><label>Your name</label><input id="name"><label>Company name</label><input id="organizationName"></div>
+<label>Email</label><input id="email" type="email" required autocomplete="email">
+<label>Password</label><input id="password" type="password" required minlength="12" autocomplete="current-password">
+<button class="primary" id="authSubmit">Log in</button><p class="error" id="authError"></p>
+</form></section>
 
-  <form id="propertyForm">
-    <label>Organization ID</label>
-    <input type="text" id="organizationId" required>
+<section id="app" class="hidden">
+<header class="top"><div><h1>WholesaleOS</h1><p id="identity" class="muted"></p></div><button id="logout">Log out</button></header>
+<div class="grid">
+<section class="card"><h2>Add property</h2><form id="propertyForm">
+<label>Address</label><input id="addressLine1" required><label>City</label><input id="city" required>
+<label>State</label><input id="state" maxlength="2" required><label>ZIP</label><input id="zip" required>
+<label>Property type</label><select id="propertyType"><option>SINGLE_FAMILY</option><option>MULTI_FAMILY_2_4</option><option>CONDO</option><option>LAND</option></select>
+<button class="primary">Save property</button></form><div class="list" id="properties"></div></section>
 
-    <label>Workspace ID</label>
-    <input type="text" id="workspaceId" required>
+<section class="card"><h2>Add seller/contact</h2><form id="contactForm">
+<label>First name</label><input id="firstName"><label>Last name</label><input id="lastName"><label>Entity/LLC</label><input id="entityName">
+<button class="primary">Save contact</button></form><div class="list" id="contacts"></div></section>
 
-    <label>Address</label>
-    <input type="text" id="addressLine1" required>
+<section class="card"><h2>Create acquisition deal</h2><form id="dealForm">
+<label>Property</label><select id="propertyId" required></select><label>Primary contact</label><select id="primaryContactId" required></select>
+<label>Lead source</label><input id="leadSource" placeholder="cold_call, PPC, referral">
+<button class="primary">Create deal</button></form><div class="list" id="deals"></div></section>
 
-    <label>City</label>
-    <input type="text" id="city" required>
-
-    <label>State</label>
-    <input type="text" id="state" required>
-
-    <label>Zip</label>
-    <input type="text" id="zip" required>
-
-    <label>Bedrooms</label>
-    <input type="number" id="bedrooms">
-
-    <label>Square Footage</label>
-    <input type="number" id="squareFootage">
-
-    <label>Property Type</label>
-    <select id="propertyType">
-      <option value="SINGLE_FAMILY">Single Family</option>
-      <option value="MULTI_FAMILY_2_4">Multi Family (2-4)</option>
-      <option value="CONDO">Condo</option>
-      <option value="LAND">Land</option>
-    </select>
-
-    <button type="submit">Add Property</button>
-  </form>
-
-  <h2>All Properties</h2>
-  <table id="propertyTable">
-    <thead>
-      <tr><th>Address</th><th>City/State</th><th>Beds</th><th>Sqft</th><th>Tags</th></tr>
-    </thead>
-    <tbody id="propertyRows"></tbody>
-  </table>
-
-  <script>
-    async function loadProperties() {
-      const res = await fetch('/properties');
-      const properties = await res.json();
-      const rows = document.getElementById('propertyRows');
-      rows.innerHTML = '';
-      properties.forEach(p => {
-        const tags = (p.distressTags || []).map(t => `<span class="tag">${t}</span>`).join('');
-        rows.innerHTML += `<tr>
-          <td>${p.addressLine1}</td>
-          <td>${p.city}, ${p.state} ${p.zip}</td>
-          <td>${p.bedrooms ?? '-'}</td>
-          <td>${p.squareFootage ?? '-'}</td>
-          <td>${tags}</td>
-        </tr>`;
-      });
-    }
-
-    document.getElementById('propertyForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const body = {
-        organizationId: document.getElementById('organizationId').value,
-        workspaceId: document.getElementById('workspaceId').value,
-        addressLine1: document.getElementById('addressLine1').value,
-        city: document.getElementById('city').value,
-        state: document.getElementById('state').value,
-        zip: document.getElementById('zip').value,
-        bedrooms: document.getElementById('bedrooms').value ? Number(document.getElementById('bedrooms').value) : undefined,
-        squareFootage: document.getElementById('squareFootage').value ? Number(document.getElementById('squareFootage').value) : undefined,
-        propertyType: document.getElementById('propertyType').value,
-      };
-
-      const res = await fetch('/properties', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': 'wholesale-secret-2026-change-me' },
-        body: JSON.stringify(body)
-      });
-
-      if (res.ok) {
-        document.getElementById('propertyForm').reset();
-        loadProperties();
-      } else {
-        const err = await res.json();
-        alert('Error: ' + err.error);
-      }
-    });
-
-    loadProperties();
-  </script>
-</body>
-</html>
+<section class="card"><h2>MAO calculator</h2><form id="maoForm">
+<label>After-repair value</label><input id="arv" type="number" min="0" required><label>Repair estimate</label><input id="repairs" type="number" min="0" required>
+<label>Wholesale fee target</label><input id="fee" type="number" min="0" required><label>Investor factor</label><input id="factor" type="number" min=".01" max="1" step=".01" value=".70">
+<button class="primary">Calculate</button></form><h2 id="maoResult" style="margin-top:18px"></h2></section>
+</div></section></main>
+<script>
+const $=id=>document.getElementById(id);let mode='login',state={me:null,properties:[],contacts:[],deals:[]};
+async function api(url,options={}){const response=await fetch(url,{...options,headers:{'Content-Type':'application/json',...(options.headers||{})}});
+if(response.status===204)return null;const body=await response.json();if(!response.ok)throw new Error(body.error||'Request failed');return body}
+function option(select,value,label){const node=document.createElement('option');node.value=value;node.textContent=label;select.append(node)}
+function row(parent,title,subtitle,badge){const box=document.createElement('div');box.className='row';const strong=document.createElement('strong');strong.textContent=title;box.append(strong);
+if(subtitle){const span=document.createElement('span');span.textContent=subtitle;box.append(span)}if(badge){const span=document.createElement('span');span.className='badge';span.textContent=badge;box.append(span)}parent.append(box)}
+function setMode(next){mode=next;$('registerFields').classList.toggle('hidden',mode==='login');$('loginTab').classList.toggle('active',mode==='login');
+$('registerTab').classList.toggle('active',mode==='register');$('authSubmit').textContent=mode==='login'?'Log in':'Create company'}
+$('loginTab').onclick=()=>setMode('login');$('registerTab').onclick=()=>setMode('register');
+$('authForm').onsubmit=async e=>{e.preventDefault();$('authError').textContent='';try{const body={email:$('email').value,password:$('password').value};
+if(mode==='register')Object.assign(body,{name:$('name').value,organizationName:$('organizationName').value});
+await api('/api/auth/'+mode,{method:'POST',body:JSON.stringify(body)});await boot()}catch(error){$('authError').textContent=error.message}};
+$('logout').onclick=async()=>{await api('/api/auth/logout',{method:'POST'});location.reload()};
+async function boot(){try{state.me=await api('/api/me');$('auth').classList.add('hidden');$('app').classList.remove('hidden');
+$('identity').textContent=state.me.user.name+' · '+state.me.user.organization.name;await refresh()}catch{$('auth').classList.remove('hidden');$('app').classList.add('hidden')}}
+async function refresh(){[state.properties,state.contacts,state.deals]=await Promise.all([api('/api/properties'),api('/api/contacts'),api('/api/deals')]);render()}
+function render(){for(const id of ['properties','contacts','deals'])$(id).replaceChildren();$('propertyId').replaceChildren();$('primaryContactId').replaceChildren();
+option($('propertyId'),'','Select property');option($('primaryContactId'),'','Select contact');
+state.properties.forEach(p=>{row($('properties'),p.addressLine1,p.city+', '+p.state+' '+p.zip);option($('propertyId'),p.id,p.addressLine1)});
+state.contacts.forEach(c=>{const name=[c.firstName,c.lastName].filter(Boolean).join(' ')||c.entityName;row($('contacts'),name,'Seller/contact');option($('primaryContactId'),c.id,name)});
+state.deals.forEach(d=>row($('deals'),d.property.addressLine1,[d.primaryContact.firstName,d.primaryContact.lastName].filter(Boolean).join(' '),d.stage))}
+$('propertyForm').onsubmit=async e=>{e.preventDefault();await api('/api/properties',{method:'POST',body:JSON.stringify({workspaceId:state.me.workspaces[0].id,addressLine1:$('addressLine1').value,city:$('city').value,state:$('state').value,zip:$('zip').value,propertyType:$('propertyType').value})});e.target.reset();await refresh()};
+$('contactForm').onsubmit=async e=>{e.preventDefault();await api('/api/contacts',{method:'POST',body:JSON.stringify({firstName:$('firstName').value,lastName:$('lastName').value,entityName:$('entityName').value})});e.target.reset();await refresh()};
+$('dealForm').onsubmit=async e=>{e.preventDefault();await api('/api/deals',{method:'POST',body:JSON.stringify({workspaceId:state.me.workspaces[0].id,propertyId:$('propertyId').value,primaryContactId:$('primaryContactId').value,leadSource:$('leadSource').value})});e.target.reset();await refresh()};
+$('maoForm').onsubmit=async e=>{e.preventDefault();const r=await api('/api/calculate-mao',{method:'POST',body:JSON.stringify({arv:Number($('arv').value),repairEstimate:Number($('repairs').value),wholesaleFeeTarget:Number($('fee').value),investorMarginFactor:Number($('factor').value)})});$('maoResult').textContent='MAO: '+new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(r.maxAllowableOffer)};
+boot();
+</script></body></html>
